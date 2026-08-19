@@ -258,8 +258,12 @@
                 nextGoalTextEl.textContent = "2500体 (ノクス)";
             } else if (killCount < 3000) {
                 nextGoalTextEl.textContent = "3000体 (リアル=モニトハック)";
+            } else if (killCount < 4000) {
+                nextGoalTextEl.textContent = "4000体 (壊れたアゼル)";
+            } else if (killCount < 5000) {
+                nextGoalTextEl.textContent = "5000体 (トロイ最終決戦)";
             } else {
-                nextGoalTextEl.textContent = "平和なPC環境";
+                nextGoalTextEl.textContent = "クリアおめでとう！";
             }
 
             if (isBossActive) {
@@ -294,8 +298,12 @@
         updateDisplay();
 
         function updateEnvironmentDisplay() {
-            if (killCount >= 3000) {
-                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (最終防衛)";
+            if (killCount >= 5000) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (クリア)";
+            } else if (killCount >= 4000) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (トロイ決戦前)";
+            } else if (killCount >= 3000) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (壊れたアゼル戦前)";
             } else if (killCount >= 2500) {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ノクス戦後)";
             } else if (killCount >= 2000) {
@@ -318,7 +326,7 @@
         }
 
         function attackVirus() {
-            if (isStoryPlaying || showRetryButtonFlag) return; // 敗北リトライ待ちは攻撃不可にする
+            if (isStoryPlaying || showRetryButtonFlag) return; 
 
             if (isBossActive) {
                 bossHp -= attackPower;
@@ -374,6 +382,12 @@
                 else if (killCount === 3000 && storyProgress < 11) {
                     startBossBattle(3000, 8000, false);
                 }
+                else if (killCount === 4000 && storyProgress < 13) {
+                    startBossBattle(4000, 15000, false, 30);
+                }
+                else if (killCount === 5000 && storyProgress < 15) {
+                    startBossBattle(5000, 50000, false, 67);
+                }
 
                 if (killCount === 750 && storyProgress === 5) {
                     storyProgress = 6;
@@ -416,7 +430,7 @@
             }
         }
 
-        function startBossBattle(bossId, maxHp, isResuming) {
+        function startBossBattle(bossId, maxHp, isResuming, customTime = 30) {
             isBossActive = true;
             currentBossId = bossId;
             bossMaxHp = maxHp;
@@ -429,16 +443,18 @@
                 1000: "ゼクス", 
                 2000: "キロガ", 
                 2500: "ノクス", 
-                3000: "リアル=モニトハック" 
+                3000: "リアル=モニトハック",
+                4000: "壊れたアゼル",
+                5000: "トロイ"
             };
             bossNameTitleEl.textContent = bossNames[bossId] || "ボス";
             enemyDisplayEl.innerHTML = `🔥 ボス戦：${bossNames[bossId]}`;
             
             bossUiEl.style.display = 'block';
-            messageEl.innerHTML = `⚠️ 30秒以内にボスを叩き潰せ！！`;
+            messageEl.innerHTML = `⚠️ ${customTime}秒以内にボスを叩き潰せ！！`;
 
             if (!isResuming) {
-                timeLeft = 30;
+                timeLeft = customTime;
                 bossHp = maxHp;
             }
 
@@ -466,7 +482,6 @@
         function retryFrom30() {
             showRetryButtonFlag = false;
             
-            // 負けたボスの最大HPに応じて正しく30体前（またはボスの直前位置）に戻す
             if (currentBossId === 50) killCount = 20;
             else if (currentBossId === 100) killCount = 70;
             else if (currentBossId === 300) killCount = 270;
@@ -475,6 +490,8 @@
             else if (currentBossId === 2000) killCount = 1970;
             else if (currentBossId === 2500) killCount = 2470;
             else if (currentBossId === 3000) killCount = 2970;
+            else if (currentBossId === 4000) killCount = 3970;
+            else if (currentBossId === 5000) killCount = 4970;
             else killCount = Math.max(0, killCount - 30);
 
             bossHp = bossMaxHp;
@@ -574,11 +591,35 @@
                 ]);
             }
             else if (bossId === 3000) {
-                storyProgress = 11;
+                storyProgress = 12;
                 killCount = 3000;
                 saveGame();
                 updateEnvironmentDisplay();
-                messageEl.innerHTML = "🎉 リアル=モニトハックを撃破した！！";
+                triggerStory([
+                    "アゼル: トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ トロイ",
+                    "トロイ: なんた、アゼル",
+                    "アゼル: セキュリティソフトヲタオシタラオレヲココカラニガシテクレルカ？",
+                    "トロイ: まあ、いいぞ",
+                    "アゼル: オオケエ"
+                ]);
+            }
+            else if (bossId === 4000) {
+                storyProgress = 14;
+                killCount = 4000;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "トロイ: 四天王は全員死んだか、しょうがない、俺が直々に始末してやる"
+                ]);
+            }
+            else if (bossId === 5000) {
+                storyProgress = 16;
+                killCount = 5000;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "クリアおめでとう！"
+                ]);
             }
         }
 
