@@ -230,6 +230,12 @@
                 nextGoalTextEl.textContent = "500体 (レグナ)";
             } else if (killCount < 1000) {
                 nextGoalTextEl.textContent = "1000体 (ゼクス)";
+            } else if (killCount < 2000) {
+                nextGoalTextEl.textContent = "2000体 (キロガ)";
+            } else if (killCount < 2500) {
+                nextGoalTextEl.textContent = "2500体 (ノクス)";
+            } else if (killCount < 3000) {
+                nextGoalTextEl.textContent = "3000体 (リアル=モニトハック)";
             } else {
                 nextGoalTextEl.textContent = "平和なPC環境";
             }
@@ -266,8 +272,14 @@
         updateDisplay();
 
         function updateEnvironmentDisplay() {
-            if (killCount >= 1000) {
+            if (killCount >= 3000) {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (最終防衛)";
+            } else if (killCount >= 2500) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ノクス戦後)";
+            } else if (killCount >= 2000) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (キロガ戦後)";
+            } else if (killCount >= 1000) {
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ゼクス戦後)";
             } else if (killCount >= 750) {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ゼクス接近)";
             } else if (killCount >= 500) {
@@ -305,7 +317,7 @@
                 saveGame();
                 messageEl.textContent = `ウィルスを駆除した！ (残り ${5000 - killCount}体)`;
 
-                // 30体到達時の最初のストーリー復活！
+                // 各種イベント・ボス発生判定
                 if (killCount === 30 && storyProgress < 1) {
                     storyProgress = 1;
                     saveGame();
@@ -331,6 +343,15 @@
                 else if (killCount === 1000 && storyProgress < 7) {
                     startBossBattle(1000, 500, false);
                 }
+                else if (killCount === 2000 && storyProgress < 9) {
+                    startBossBattle(2000, 4000, false);
+                }
+                else if (killCount === 2500 && storyProgress < 10) {
+                    startBossBattle(2500, 6000, false);
+                }
+                else if (killCount === 3000 && storyProgress < 11) {
+                    startBossBattle(3000, 8000, false);
+                }
 
                 if (killCount === 750 && storyProgress === 5) {
                     storyProgress = 6;
@@ -341,6 +362,19 @@
                         "アゼル: 最近のトロイ様、セキュリティソフトのせいでイライラしてないか？",
                         "ゼクス: トロイ様を落ち着けるために、俺がセキュリティ野郎を倒してくる",
                         "アゼル: 絶対倒して戻ってこいよ"
+                    ]);
+                }
+                else if (killCount === 1500 && storyProgress === 7) {
+                    storyProgress = 8;
+                    saveGame();
+                    triggerStory([
+                        "ノクス: あら、アゼルどうしたの？",
+                        "アゼル: トロイから逃げないか？あんなクズに従っていたら命が持たない",
+                        "ノクス: あら、録音したわよ、これをトロイ様に見せようかしらねぇ...",
+                        "アゼル: 裏切ったのか？",
+                        "ノクス: あんたなんてタダの仕事仲間よ、こんな密告で報酬が貰えるなんて都合のいい話だわ♪",
+                        "アゼル: もう...やめてくれ",
+                        "ノクス: ではセキュリティ野郎も倒して手柄を上げて、報酬を貰おうかしらね、行きなさい、キロガ"
                     ]);
                 }
             }
@@ -363,7 +397,16 @@
             currentBossId = bossId;
             bossMaxHp = maxHp;
             
-            let bossNames = { 50: "トロイの木犬", 100: "フィッシュ・イング", 300: "ウシロ・ドア", 500: "レグナ", 1000: "ゼクス" };
+            let bossNames = { 
+                50: "トロイの木犬", 
+                100: "フィッシュ・イング", 
+                300: "ウシロ・ドア", 
+                500: "レグナ", 
+                1000: "ゼクス", 
+                2000: "キロガ", 
+                2500: "ノクス", 
+                3000: "リアル=モニトハック" 
+            };
             bossNameTitleEl.textContent = bossNames[bossId] || "ボス";
             enemyDisplayEl.innerHTML = `🔥 ボス戦：${bossNames[bossId]}`;
             
@@ -424,7 +467,7 @@
                     "アゼル: トロイさま、トロイの木犬がやられました",
                     "トロイ: なかなかやるな、おい！レグナ出てこい",
                     "レグナ: トロイさま、次はフィッシュ・イングを向かわせましょう",
-                    "トロイ: さすがにそれなら勝てるだろう、向かわせろ、"
+                    "トロイ: 向かわせろ"
                 ]);
             } 
             else if (bossId === 100) {
@@ -435,7 +478,7 @@
                 triggerStory([
                     "アゼル: え？フィッシュ・イングもやられたんですが...",
                     "トロイ: もういいレグナ、自らいけ",
-                    "レグナ: もう1度チャンスをください、ウシロ・ドアを向かわせます",
+                    "レグナ: ウシロ・ドアを向かわせます",
                     "トロイ: 次はないからな"
                 ]);
             }
@@ -445,7 +488,7 @@
                 saveGame();
                 updateEnvironmentDisplay();
                 triggerStory([
-                    "レグナ: ,,,行ってきますトロイ様",
+                    "レグナ: 行ってきますトロイ様",
                     "トロイ: 必ず倒してこい"
                 ]);
             }
@@ -458,7 +501,7 @@
                     "トロイ: レグナがやられたか",
                     "アゼル: 悲しいです、トロイ様",
                     "トロイ: 悲しい？そんな事考えずに働け",
-                    "アゼル: ,,,っ"
+                    "アゼル: ..."
                 ]);
             }
             else if (bossId === 1000) {
@@ -466,7 +509,43 @@
                 killCount = 1000;
                 saveGame();
                 updateEnvironmentDisplay();
-                messageEl.innerHTML = "🎉 幹部ゼクスを撃破した！！平和への道が開ける…！";
+                triggerStory([
+                    "アゼル: ゼクス...嘘だよな",
+                    "トロイ: どうした？あの役たたずは死んだが",
+                    "アゼル: 取り消せ、今の言葉",
+                    "トロイ: なんだ？四天王ごときが口答えか？消してやろうか？ああん？",
+                    "アゼル: すみません、なにやらプログラムがバグっていたようです..."
+                ]);
+            }
+            else if (bossId === 2000) {
+                storyProgress = 9;
+                killCount = 2000;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "ノクス: あら、キロガやられたのね、私自ら行くとしますか...",
+                    "アゼル: そのまま死ね(x15)"
+                ]);
+            }
+            else if (bossId === 2500) {
+                storyProgress = 10;
+                killCount = 2500;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "アゼル: ハハ、死んだな、死んだな死んだ死んだ死んだ死んだ",
+                    "トロイ: アゼル、なにか嫌なことでもあったか？",
+                    "アゼル: 黙れ寄生しないと動けもしない木馬に頼った単細胞生物",
+                    "トロイ: はあ、出来の悪すぎる部下を持ったな、まあすぐ死ぬだろうしいいか",
+                    "トロイ: いけ、リアル=モニトハック"
+                ]);
+            }
+            else if (bossId === 3000) {
+                storyProgress = 11;
+                killCount = 3000;
+                saveGame();
+                updateEnvironmentDisplay();
+                messageEl.innerHTML = "🎉 リアル=モニトハックを撃破した！！";
             }
         }
 
@@ -488,7 +567,7 @@
                     clearInterval(dialogueInterval);
                     endStory();
                 }
-            }, 5000);
+            }, 3000);
         }
 
         function endStory() {
