@@ -3,41 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-　  <title>コンピュータウィルス撲滅大作戦☆</title>
+    <title>コンピュータウィルス撲滅大作戦☆</title>
     <style>
-        :root { --bg-color: #0b1d3a; --neon-green: #00ff66; --neon-red: #ff3333; --white: #f0f0f0; }
-        body { font-family: 'Courier New', monospace; background-color: var(--bg-color); color: var(--white); text-align: center; margin: 0; padding: 20px; }
+        :root { --bg-color: #0b1d3a; --neon-green: #00ff66; --neon-red: #ff3333; --neon-yellow: #ffcc00; --white: #f0f0f0; }
+        body { 
+            font-family: 'Courier New', monospace; 
+            background-color: var(--bg-color); 
+            color: var(--white); 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px; 
+            touch-action: manipulation;
+        }
         
         /* 左上のストーリー進行度POP */
         .story-pop {
             position: fixed;
             top: 15px;
             left: 15px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             border: 2px dashed var(--neon-green);
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--neon-green);
             text-align: left;
-            box-shadow: 0 0 10px rgba(0,255,102,0.2);
             z-index: 100;
         }
-        .story-pop strong { color: #fff; font-size: 1rem; }
+        .story-pop strong { color: #fff; font-size: 0.9rem; }
 
-        .container { max-width: 600px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 25px; border-radius: 15px; border: 2px solid var(--neon-green); box-shadow: 0 0 15px rgba(0,255,102,0.3); margin-top: 40px; }
-        h1 { color: var(--neon-green); font-size: 1.5rem; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
-        
-        .status-box { background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; margin: 15px 0; border: 1px solid #444; }
-        .battle-area { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 10px; margin: 20px 0; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        
-        button { background: var(--neon-green); color: #000; border: none; padding: 12px 25px; font-size: 1rem; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; margin: 5px; }
-        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
-        .btn-reset { background: #ff3333; color: #fff; font-size: 0.8rem; padding: 8px 15px; }
+        /* 右上の強化ボタン・コイン表示 */
+        .shop-pop {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid var(--neon-yellow);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--neon-yellow);
+            text-align: right;
+            z-index: 100;
+        }
+        .shop-btn {
+            background: var(--neon-yellow);
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
 
-        /* ボス戦用タイマー・HP表示 */
-        #boss-ui { display: none; margin-bottom: 15px; color: var(--neon-red); font-weight: bold; }
-        .boss-hp-bar { width: 100%; max-width: 300px; height: 15px; background: #333; border: 1px solid var(--neon-red); border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .container { max-width: 600px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 25px; border-radius: 15px; border: 2px solid var(--neon-green); box-shadow: 0 0 15px rgba(0,255,102,0.3); margin-top: 50px; }
+        h1 { color: var(--neon-green); font-size: 1.4rem; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
+        
+        .status-box { background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; margin: 15px 0; border: 1px solid #444; font-size: 0.9rem; }
+        .battle-area { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0; min-height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        /* 巨大化したウィルス撲滅ボタン */
+        .big-attack-btn { 
+            background: var(--neon-green); 
+            color: #000; 
+            border: none; 
+            padding: 22px 40px; 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.1s; 
+            margin: 10px 0; 
+            box-shadow: 0 0 15px rgba(0,255,102,0.4);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .big-attack-btn:active { transform: scale(0.95); background: #fff; }
+
+        .btn-reset { background: #ff3333; color: #fff; font-size: 0.8rem; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .btn-retry { background: #ffcc00; color: #000; font-size: 0.9rem; font-weight: bold; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; display: none; margin: 10px auto; }
+
+        /* ボス戦用UI */
+        #boss-ui { display: none; margin-bottom: 10px; color: var(--neon-red); font-weight: bold; font-size: 0.9rem; width: 100%; }
+        .boss-hp-bar { width: 100%; max-width: 300px; height: 14px; background: #333; border: 1px solid var(--neon-red); border-radius: 5px; overflow: hidden; margin: 5px auto; }
         .boss-hp-fill { width: 100%; height: 100%; background: var(--neon-red); transition: width 0.1s; }
 
         /* ストーリー用オーバーレイ */
@@ -45,34 +95,47 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.96);
             z-index: 9999;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             opacity: 0;
             transition: opacity 0.8s ease;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .story-text-box {
             max-width: 500px;
-            padding: 20px;
-            font-size: 1.2rem;
+            padding: 25px;
+            font-size: 1.1rem;
             color: var(--neon-red);
             border: 1px dashed var(--neon-red);
-            background: rgba(20, 0, 0, 0.6);
-            min-height: 3em;
+            background: rgba(20, 0, 0, 0.7);
+            min-height: 4em;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            line-height: 1.6;
             text-shadow: 0 0 8px rgba(255,51,51,0.6);
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
+    <!-- 左上：ストーリー進行度ポップ -->
     <div class="story-pop">
-        📜 次のイベントまで<br>
-        あと <strong id="remaining-to-story">30</strong> 体
+        📜 次の目標:<br>
+        <strong id="next-goal-text">50体 (トロイの木犬)</strong>
+    </div>
+
+    <!-- 右上：コイン＆強化ショップ -->
+    <div class="shop-pop" id="shop-container" style="display: none;">
+        🪙 コイン: <span id="coin-count">0</span><br>
+        ⚔️ 攻撃力: <span id="atk-power">1</span><br>
+        <button class="shop-btn" onclick="upgradeAtk()">攻撃強化 (150🪙)</button>
     </div>
 
     <div class="container">
@@ -84,143 +147,341 @@
         <div class="battle-area">
             <!-- ボス戦UI -->
             <div id="boss-ui">
-                ⚠️ 中ボス「トロイの木犬」交戦中！<br>
-                残り時間: <span id="timer-display">30</span>秒<br>
-                HP: <span id="boss-hp">50</span> / 50
+                ⚠️ <span id="boss-name-title">中ボス交戦中</span>！<br>
+                残り時間: <span id="timer-display">30</span>秒 | HP: <span id="boss-hp">50</span> / <span id="boss-max-hp">50</span>
                 <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill"></div></div>
             </div>
 
-            <div id="enemy-display" style="font-size: 2rem; margin-bottom: 10px;">🦠 雑魚ウィルス</div>
-            <button id="action-btn" onclick="attackVirus()">ウィルスを駆除する！</button>
+            <div id="enemy-display" style="font-size: 1.5rem; margin-bottom: 5px;">🦠 雑魚ウィルス</div>
+            
+            <!-- 巨大化したメインボタン -->
+            <button class="big-attack-btn" id="action-btn" onclick="attackVirus()">ウィルスを駆除する！</button>
+            
+            <!-- 負けた時の救済ボタン -->
+            <button class="btn-retry" id="retry-btn" onclick="retryFrom30()">🔄 30体前に戻って再挑戦する</button>
         </div>
-        <div id="message" style="color: #00ff66; font-weight: bold;">PCを守るため、ウィルスを叩け！</div>
+        
+        <div id="message" style="color: #00ff66; font-weight: bold; font-size: 0.9rem;">PCを守るため、ウィルスを叩け！</div>
 
         <button class="btn-reset" onclick="resetData()">データを初期化（リセット）</button>
     </div>
 
+    <!-- ストーリー割り込み用オーバーレイ -->
     <div id="story-overlay">
-        <div style="font-size: 0.9rem; color: #888; margin-bottom: 15px; letter-spacing: 2px;">ーーー 通信傍受中 ーーー</div>
+        <div style="font-size: 0.85rem; color: #888; margin-bottom: 15px; letter-spacing: 2px;">ーーー 通信傍受中 ーーー</div>
         <div class="story-text-box" id="story-text">...</div>
     </div>
 
     <script>
+        // --- 状態変数 ---
         let killCount = parseInt(localStorage.getItem('virus_kill_count')) || 0;
-        let isStory1Finished = localStorage.getItem('virus_story1_done') === 'true';
+        let coins = parseInt(localStorage.getItem('virus_coins')) || 0;
+        let attackPower = parseInt(localStorage.getItem('virus_atk')) || 1;
+        
+        let storyProgress = parseInt(localStorage.getItem('virus_story_prog')) || 0; 
+        // 0:初期, 1:50体後, 2:100体後(魚撃破), 3:300体後(ドア撃破), 4:500体後(レグナ撃破), 5:750体後, 6:1000体後
+        
         let isBossActive = localStorage.getItem('virus_boss_active') === 'true';
-        let isBossDefeated = localStorage.getItem('virus_boss_defeated') === 'true';
-        let isStoryPlaying = false;
-
-        // ボス用変数
+        let currentBossId = parseInt(localStorage.getItem('virus_current_boss')) || 50; // 50, 100, 300, 500, 1000
         let bossHp = parseInt(localStorage.getItem('virus_boss_hp')) || 50;
+        let bossMaxHp = parseInt(localStorage.getItem('virus_boss_max_hp')) || 50;
+        
+        let isStoryPlaying = false;
         let timeLeft = 30;
         let bossTimer = null;
         let reviveTimer = null;
+        let showRetryButtonFlag = false;
 
         const killCountEl = document.getElementById('kill-count');
-        const remainingEl = document.getElementById('remaining-to-story');
+        const nextGoalTextEl = document.getElementById('next-goal-text');
         const messageEl = document.getElementById('message');
         const storyOverlay = document.getElementById('story-overlay');
         const storyTextEl = document.getElementById('story-text');
+        const enemyDisplayEl = document.getElementById('enemy-display');
+        
+        const shopContainerEl = document.getElementById('shop-container');
+        const coinCountEl = document.getElementById('coin-count');
+        const atkPowerEl = document.getElementById('atk-power');
+        const retryBtnEl = document.getElementById('retry-btn');
         
         const bossUiEl = document.getElementById('boss-ui');
+        const bossNameTitleEl = document.getElementById('boss-name-title');
         const bossHpEl = document.getElementById('boss-hp');
+        const bossMaxHpEl = document.getElementById('boss-max-hp');
         const bossHpFillEl = document.getElementById('boss-hp-fill');
         const timerDisplayEl = document.getElementById('timer-display');
-        const enemyDisplayEl = document.getElementById('enemy-display');
 
+        // --- UI更新関数 ---
         function updateDisplay() {
             killCountEl.textContent = killCount;
-            
-            // イベント目標の計算（30体でストーリー1、50体でボス）
-            let remaining = 30 - killCount;
-            if (killCount >= 30 && !isBossDefeated) {
-                remaining = 50 - killCount;
-                remainingEl.innerHTML = `<span style="color:var(--neon-red);">ボス戦まであと ${remaining}体</span>`;
-            } else if (isBossDefeated) {
-                remainingEl.textContent = "0 (ボス撃破済)";
+            coinCountEl.textContent = coins;
+            atkPowerEl.textContent = attackPower;
+
+            // フィッシュ・イング（100体目ボス）を撃破した以降（storyProgress >= 2）ならショップを表示
+            if (storyProgress >= 2) {
+                shopContainerEl.style.display = 'block';
             } else {
-                remainingEl.textContent = remaining > 0 ? remaining : 0;
+                shopContainerEl.style.display = 'none';
+            }
+
+            // 次の目標テキストの更新
+            if (killCount < 50) {
+                nextGoalTextEl.textContent = "50体 (トロイの木犬)";
+            } else if (killCount < 100) {
+                nextGoalTextEl.textContent = "100体 (フィッシュ・イング)";
+            } else if (killCount < 300) {
+                nextGoalTextEl.textContent = "300体 (ウシロ・ドア)";
+            } else if (killCount < 500) {
+                nextGoalTextEl.textContent = "500体 (レグナ)";
+            } else if (killCount < 1000) {
+                nextGoalTextEl.textContent = "1000体 (ゼクス)";
+            } else {
+                nextGoalTextEl.textContent = "平和なPC環境";
             }
 
             if (isBossActive) {
                 bossHpEl.textContent = bossHp;
-                bossHpFillEl.style.width = (bossHp / 50 * 100) + '%';
+                bossMaxHpEl.textContent = bossMaxHp;
+                bossHpFillEl.style.width = Math.max(0, (bossHp / bossMaxHp * 100)) + '%';
+            }
+
+            if (showRetryButtonFlag) {
+                retryBtnEl.style.display = 'block';
+            } else {
+                retryBtnEl.style.display = 'none';
             }
         }
 
-        // 起動時の復元処理
-        if (isBossActive && !isBossDefeated) {
-            startBossBattle(true); // ページリロード時もボス戦を再開
-        } else if (isBossDefeated) {
-            enemyDisplayEl.innerHTML = "🛡️ ピースフルエリア";
-        } else if (killCount >= 30) {
-            enemyDisplayEl.innerHTML = "🐕 トロイの木犬接近中";
+        // --- セーブ関数 ---
+        function saveGame() {
+            localStorage.setItem('virus_kill_count', killCount);
+            localStorage.setItem('virus_coins', coins);
+            localStorage.setItem('virus_atk', attackPower);
+            localStorage.setItem('virus_story_prog', storyProgress);
+            localStorage.setItem('virus_boss_active', isBossActive);
+            localStorage.setItem('virus_current_boss', currentBossId);
+            localStorage.setItem('virus_boss_hp', bossHp);
+            localStorage.setItem('virus_boss_max_hp', bossMaxHp);
+        }
+
+        // --- 初期ロード時の復元 ---
+        if (isBossActive) {
+            startBossBattle(currentBossId, bossMaxHp, true);
+        } else {
+            updateEnvironmentDisplay();
         }
         updateDisplay();
 
-        function saveGame() {
-            localStorage.setItem('virus_kill_count', killCount);
-            localStorage.setItem('virus_story1_done', isStory1Finished);
-            localStorage.setItem('virus_boss_active', isBossActive);
-            localStorage.setItem('virus_boss_defeated', isBossDefeated);
-            localStorage.setItem('virus_boss_hp', bossHp);
+        function updateEnvironmentDisplay() {
+            if (killCount >= 1000) {
+                enemyDisplayEl.innerHTML = "🛡️ 最終防衛エリア";
+            } else if (killCount >= 750) {
+                enemyDisplayEl.innerHTML = "👾 ゼクス領域";
+            } else if (killCount >= 500) {
+                enemyDisplayEl.innerHTML = "👾 レグナ領域";
+            } else if (killCount >= 300) {
+                enemyDisplayEl.innerHTML = "🚪 ウシロ・ドア領域";
+            } else if (killCount >= 100) {
+                enemyDisplayEl.innerHTML = "🐟 フィッシュ・イング領域";
+            } else if (killCount >= 50) {
+                enemyDisplayEl.innerHTML = "🐕 トロイの木犬討伐後";
+            } else {
+                enemyDisplayEl.innerHTML = "🦠 雑魚ウィルス";
+            }
         }
 
-        // メインの攻撃・クリック処理
+        // --- 攻撃ボタン処理 ---
         function attackVirus() {
             if (isStoryPlaying) return;
 
             if (isBossActive) {
-                // --- ボス戦中の処理 ---
-                bossHp--;
+                // ボス戦中
+                bossHp -= attackPower;
                 updateDisplay();
                 saveGame();
 
                 if (bossHp <= 0) {
-                    // ボス撃破！
-                    clearInterval(bossTimer);
-                    clearInterval(reviveTimer);
-                    isBossActive = false;
-                    isBossDefeated = true;
-                    killCount = 50;
-                    saveGame();
-
-                    bossUiEl.style.display = 'none';
-                    enemyDisplayEl.innerHTML = "🛡️ 撃破完了！";
-                    messageEl.innerHTML = "🎉 中ボス「トロイの木犬」を完全駆除した！！";
+                    defeatBoss(currentBossId);
                 }
-            } else if (!isBossDefeated) {
-                // --- 通常雑魚戦の処理 ---
+            } else {
+                // 通常雑魚戦
                 killCount++;
-                updateDisplay();
-                messageEl.textContent = `ウィルスを1体駆除した！（残り ${5000 - killCount}体）`;
-                saveGame();
-
-                // 30体到達時：ストーリー発動
-                if (killCount === 30 && !isStory1Finished) {
-                    triggerFirstStory();
+                
+                // 100体目（フィッシュ・イング撃破後＝storyProgress 2以上）からコイン獲得
+                if (storyProgress >= 2) {
+                    coins += 1;
                 }
-                // 50体到達時：ボス戦突入
-                else if (killCount === 50 && !isBossActive) {
-                    startBossBattle(false);
+
+                updateDisplay();
+                saveGame();
+                messageEl.textContent = `ウィルスを駆除した！ (残り ${5000 - killCount}体)`;
+
+                // ボス出現判定
+                if (killCount === 50 && storyProgress < 1) {
+                    startBossBattle(50, 50, false);
+                } else if (killCount === 100 && storyProgress < 2) {
+                    startBossBattle(100, 100, false);
+                } else if (killCount === 300 && storyProgress < 3) {
+                    startBossBattle(300, 300, false);
+                } else if (killCount === 500 && storyProgress < 4) {
+                    startBossBattle(500, 300, false); // レグナ HP300
+                } else if (killCount === 1000 && storyProgress < 6) {
+                    startBossBattle(1000, 500, false); // ゼクス HP500
                 }
             }
         }
 
-        // 30体ストーリー
-        function triggerFirstStory() {
+        // --- 攻撃力強化ショップ ---
+        function upgradeAtk() {
+            if (coins >= 150) {
+                coins -= 150;
+                attackPower += 1;
+                updateDisplay();
+                saveGame();
+                messageEl.textContent = `✨ 攻撃力が上がった！ 現在の攻撃力: ${attackPower}`;
+            } else {
+                messageEl.textContent = "⚠️ コインが足りません！（必要: 150🪙）";
+            }
+        }
+
+        // --- ボス戦開始 ---
+        function startBossBattle(bossId, maxHp, isResuming) {
+            isBossActive = true;
+            currentBossId = bossId;
+            bossMaxHp = maxHp;
+            
+            let bossNames = { 50: "トロイの木犬", 100: "フィッシュ・イング", 300: "ウシロ・ドア", 500: "レグナ", 1000: "ゼクス" };
+            bossNameTitleEl.textContent = bossNames[bossId] || "ボス";
+            enemyDisplayEl.innerHTML = `🔥 ボス：${bossNames[bossId]}`;
+            
+            bossUiEl.style.display = 'block';
+            messageEl.innerHTML = `⚠️ 30秒以内にボスを叩き潰せ！！`;
+
+            if (!isResuming) {
+                timeLeft = 30;
+                bossHp = maxHp;
+            }
+
+            saveGame();
+            updateDisplay();
+
+            clearInterval(bossTimer);
+            bossTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplayEl.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(bossTimer);
+                    bossUiEl.style.display = 'none';
+                    isBossActive = false;
+                    saveGame();
+                    
+                    messageEl.innerHTML = "❌ タイムアップ……！ボスに敗北した……";
+                    // 負けた時だけ30体前に戻るボタンが出現
+                    showRetryButtonFlag = true;
+                    updateDisplay();
+                }
+            }, 1000);
+        }
+
+        // --- 負けた時：30体前に戻る ---
+        function retryFrom30() {
+            showRetryButtonFlag = false;
+            // 現在のキル数から30体戻す（最低でも前のセーフティラインへ）
+            killCount = Math.max(0, killCount - 30);
+            bossHp = bossMaxHp;
+            isBossActive = false;
+            saveGame();
+            updateEnvironmentDisplay();
+            updateDisplay();
+            messageEl.innerHTML = "🔄 30体前に戻って体制を立て直した！再挑戦だ！";
+        }
+
+        // --- ボス撃破時の処理 ＆ ストーリー分岐 ---
+        function defeatBoss(bossId) {
+            clearInterval(bossTimer);
+            clearInterval(reviveTimer);
+            isBossActive = false;
+            bossUiEl.style.display = 'none';
+            showRetryButtonFlag = false;
+
+            if (bossId === 50) {
+                storyProgress = 1;
+                killCount = 50;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "アゼル: トロイさま、トロイの木犬がやられました",
+                    "トロイ: なかなかやるな、おい！レグナ出てこい",
+                    "レグナ: トロイさま、次はフィッシュ・イングを向かわせましょう",
+                    "トロイ: さすがにそれなら勝てるだろう、向かわせろ、"
+                ], 50);
+            } 
+            else if (bossId === 100) {
+                storyProgress = 2;
+                killCount = 100;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "アゼル: え？フィッシュ・イングもやられたんですが...",
+                    "トロイ: もういいレグナ、自らいけ",
+                    "レグナ: もう1度チャンスをください、ウシロ・ドアを向かわせます",
+                    "トロイ: 次はないからな"
+                ], 100);
+            }
+            else if (bossId === 300) {
+                storyProgress = 3;
+                killCount = 300;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "レグナ: ,,,行ってきますトロイ様",
+                    "トロイ: 必ず倒してこい"
+                ], 300);
+            }
+            else if (bossId === 500) {
+                storyProgress = 4;
+                killCount = 500;
+                saveGame();
+                updateEnvironmentDisplay();
+                triggerStory([
+                    "トロイ: レグナがやられたか",
+                    "アゼル: 悲しいです、トロイ様",
+                    "トロイ: 悲しい？そんな事考えずに働け",
+                    "アゼル: ,,,っ"
+                ], 500);
+            }
+            else if (bossId === 1000) {
+                storyProgress = 6;
+                killCount = 1000;
+                saveGame();
+                updateEnvironmentDisplay();
+                messageEl.innerHTML = "🎉 幹部ゼクスを撃破した！！平和への道が開ける…！";
+            }
+        }
+
+        // --- 750体目の途中ストーリー判定（雑魚狩り中のイベント） ---
+        function checkMiddleStories() {
+            if (killCount === 750 && storyProgress === 4) {
+                storyProgress = 5;
+                saveGame();
+                triggerStory([
+                    "アゼル: ゼクス来てくれ",
+                    "ゼクス: ああ、アゼルじゃないか、どうした？",
+                    "アゼル: 最近のトロイ様、セキュリティソフトのせいでイライラしてないか？",
+                    "ゼクス: トロイ様を落ち着けるために、俺がセキュリティ野郎を倒してくる",
+                    "アゼル: 絶対倒して戻ってこいよ"
+                ], 750);
+            }
+        }
+
+        // --- ストーリー演出再生エンジン (5秒ごとオート送り) ---
+        function triggerStory(dialogues, targetKill) {
             isStoryPlaying = true;
-            messageEl.textContent = "⚠️ 警告：不審な外部通信を検知……";
+            messageEl.textContent = "⚠️ 内部通信の傍受中……";
 
             storyOverlay.style.display = 'flex';
             setTimeout(() => { storyOverlay.style.opacity = '1'; }, 50);
-
-            const dialogues = [
-                "トロイ: このpcにセキュリティソフトが来たようだな",
-                "アゼル: どうせ大したことない雑魚ですよ",
-                "アゼル: 中ボスの「トロイの木犬」を向かわせます",
-                "トロイ: それで十分だろう、早速実行に移れ"
-            ];
 
             let index = 0;
             storyTextEl.textContent = dialogues[index];
@@ -231,64 +492,32 @@
                     storyTextEl.textContent = dialogues[index];
                 } else {
                     clearInterval(dialogueInterval);
-                    isStory1Finished = true;
-                    saveGame();
-                    updateDisplay();
-                    endFirstStory();
+                    endStory(targetKill);
                 }
-            }, 5000);
+            }, 5000); // 5秒ごと
         }
 
-        function endFirstStory() {
+        function endStory(targetKill) {
             storyOverlay.style.opacity = '0';
             setTimeout(() => {
                 storyOverlay.style.display = 'none';
                 isStoryPlaying = false;
-                messageEl.textContent = "🔥 50体目に「トロイの木犬」が出現する…備えろ！";
-                enemyDisplayEl.innerHTML = "🐕 トロイの木犬接近中";
+                messageEl.textContent = `🔥 次の目標に向けて戦闘再開！`;
+                updateDisplay();
             }, 800);
         }
 
-        // --- ボス戦開始ロジック ---
-        function startBossBattle(isResuming) {
-            isBossActive = true;
-            enemyDisplayEl.innerHTML = "🐕 中ボス：トロイの木犬";
-            bossUiEl.style.display = 'block';
-            messageEl.innerHTML = "⚠️ 30秒以内に50回連打して撃破しろ！！";
-
-            if (!isResuming) {
-                timeLeft = 30;
-                bossHp = 50;
+        // 通常攻撃時の750体チェック拡張
+        const originalAttack = attackVirus;
+        // （上で直接記述したため、キル数増加時にcheckMiddleStoriesを挟む）
+        // 攻撃処理の中に直接組み込み済みですが、念のため追加のキル時チェック
+        function hookCheck(k) {
+            if (k === 750 && storyProgress === 4) {
+                checkMiddleStories();
             }
-
-            saveGame();
-            updateDisplay();
-
-            // 30秒の制限タイマー開始
-            clearInterval(bossTimer);
-            bossTimer = setInterval(() => {
-                timeLeft--;
-                timerDisplayEl.textContent = timeLeft;
-
-                if (timeLeft <= 0) {
-                    // 時間切れ！
-                    clearInterval(bossTimer);
-                    bossUiEl.style.display = 'none';
-                    messageEl.innerHTML = "❌ タイムアップ……！トロイの木犬が再生を始める……";
-                    
-                    // 5秒後にHP復活
-                    clearInterval(reviveTimer);
-                    reviveTimer = setTimeout(() => {
-                        bossHp = 50;
-                        timeLeft = 30;
-                        bossUiEl.style.display = 'block';
-                        messageEl.innerHTML = "🔄 HPが復活した！再び30秒以内に叩け！！";
-                        startBossBattle(true); // タイマー再始動
-                    }, 5000); // 5秒後
-                }
-            }, 1000);
         }
 
+        // リセット機能
         function resetData() {
             if (confirm("本当にデータを初期化しますか？")) {
                 localStorage.clear();
