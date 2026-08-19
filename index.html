@@ -88,7 +88,7 @@
         .big-attack-btn:active { transform: scale(0.95); background: #fff; }
 
         .btn-reset { background: #ff3333; color: #fff; font-size: 0.8rem; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .btn-retry { background: #ffcc00; color: #000; font-size: 0.9rem; font-weight: bold; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; display: none; margin: 10px auto; }
+        .btn-retry { background: var(--neon-yellow); color: #000; font-size: 0.9rem; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; display: none; margin: 15px auto; box-shadow: 0 0 10px rgba(255,204,0,0.4); }
 
         /* ボス戦用UI */
         #boss-ui { display: none; margin-bottom: 10px; color: var(--neon-red); font-weight: bold; font-size: 0.9rem; width: 100%; }
@@ -163,7 +163,7 @@
             <button class="big-attack-btn" id="action-btn">ウィルスを駆除する！</button>
             
             <!-- 負けた時の救済ボタン -->
-            <button class="btn-retry" id="retry-btn" onclick="retryFrom30()">🔄 30体前に戻って再挑戦する</button>
+            <button class="btn-retry" id="retry-btn" onclick="retryFrom30()">🔄 30体巻き戻して再挑戦する</button>
         </div>
         
         <div id="message" style="color: #00ff66; font-weight: bold; font-size: 0.9rem;">PCを守るため、ウィルスを叩け！</div>
@@ -318,7 +318,7 @@
         }
 
         function attackVirus() {
-            if (isStoryPlaying) return;
+            if (isStoryPlaying || showRetryButtonFlag) return; // 敗北リトライ待ちは攻撃不可にする
 
             if (isBossActive) {
                 bossHp -= attackPower;
@@ -464,16 +464,25 @@
         }
 
         function retryFrom30() {
-            alert("負けたので30体巻き戻します\n\nコインを稼いで、強化してリベンジしよう！");
-
             showRetryButtonFlag = false;
-            killCount = Math.max(0, killCount - 30);
+            
+            // 負けたボスの最大HPに応じて正しく30体前（またはボスの直前位置）に戻す
+            if (currentBossId === 50) killCount = 20;
+            else if (currentBossId === 100) killCount = 70;
+            else if (currentBossId === 300) killCount = 270;
+            else if (currentBossId === 500) killCount = 470;
+            else if (currentBossId === 1000) killCount = 970;
+            else if (currentBossId === 2000) killCount = 1970;
+            else if (currentBossId === 2500) killCount = 2470;
+            else if (currentBossId === 3000) killCount = 2970;
+            else killCount = Math.max(0, killCount - 30);
+
             bossHp = bossMaxHp;
             isBossActive = false;
             saveGame();
             updateEnvironmentDisplay();
             updateDisplay();
-            messageEl.innerHTML = "🔄 30体前に戻って体制を立て直した！再挑戦だ！";
+            messageEl.innerHTML = "🔄 体制を立て直した！再挑戦だ！";
         }
 
         function defeatBoss(bossId) {
