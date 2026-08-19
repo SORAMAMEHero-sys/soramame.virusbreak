@@ -14,6 +14,8 @@
             margin: 0; 
             padding: 20px; 
             touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* 左上のストーリー進行度POP */
@@ -64,7 +66,7 @@
         .status-box { background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; margin: 15px 0; border: 1px solid #444; font-size: 0.9rem; }
         .battle-area { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0; min-height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        /* 巨大化したメインボタン */
+        /* 巨大化したメインボタン ＆ マルチタッチ・連打特化 */
         .big-attack-btn { 
             background: var(--neon-green); 
             color: #000; 
@@ -74,11 +76,14 @@
             font-weight: bold; 
             border-radius: 12px; 
             cursor: pointer; 
-            transition: 0.1s; 
+            transition: transform 0.05s; 
             margin: 10px 0; 
             box-shadow: 0 0 15px rgba(0,255,102,0.4);
+            
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .big-attack-btn:active { transform: scale(0.95); background: #fff; }
 
@@ -154,8 +159,8 @@
 
             <div id="enemy-display" style="font-size: 1.5rem; margin-bottom: 5px;">🦠 ウィルス戦</div>
             
-            <!-- 巨大メインボタン -->
-            <button class="big-attack-btn" id="action-btn" onclick="attackVirus()">ウィルスを駆除する！</button>
+            <!-- 巨大メインボタン（マルチタッチ対応） -->
+            <button class="big-attack-btn" id="action-btn">ウィルスを駆除する！</button>
             
             <!-- 負けた時の救済ボタン -->
             <button class="btn-retry" id="retry-btn" onclick="retryFrom30()">🔄 30体前に戻って再挑戦する</button>
@@ -199,6 +204,7 @@
         const coinCountEl = document.getElementById('coin-count');
         const atkPowerEl = document.getElementById('atk-power');
         const retryBtnEl = document.getElementById('retry-btn');
+        const actionBtnEl = document.getElementById('action-btn');
         
         const bossUiEl = document.getElementById('boss-ui');
         const bossNameTitleEl = document.getElementById('boss-name-title');
@@ -206,6 +212,22 @@
         const bossMaxHpEl = document.getElementById('boss-max-hp');
         const bossHpFillEl = document.getElementById('boss-hp-fill');
         const timerDisplayEl = document.getElementById('timer-display');
+
+        // 複数本の指での同時タップ（マルチタッチ）をすべて攻撃として受け付ける
+        actionBtnEl.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                attackVirus();
+            }
+        }, { passive: false });
+
+        // マウスやペンなどの単体クリック用
+        actionBtnEl.addEventListener('pointerdown', (e) => {
+            if (e.pointerType !== 'touch') {
+                e.preventDefault();
+                attackVirus();
+            }
+        });
 
         function updateDisplay() {
             killCountEl.textContent = killCount;
@@ -378,7 +400,6 @@
                     ]);
                 }
 
-                // 通常ザコを倒した時も、区切りごとに表示を更新する
                 updateEnvironmentDisplay();
             }
         }
