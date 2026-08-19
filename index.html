@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コンピュータウィルス撲滅大作戦☆</title>
+    <style>
+        :root { --bg-color: #0b1d3a; --neon-green: #00ff66; --neon-red: #ff3333; --white: #f0f0f0; }
+        body { font-family: 'Courier New', monospace; background-color: var(--bg-color); color: var(--white); text-align: center; margin: 0; padding: 20px; }
+        
+        /* ▼▼▼ 左上のストーリー進行度POPのスタイル ▼▼▼ */
+        .story-pop {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px dashed var(--neon-green);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--neon-green);
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0,255,102,0.2);
+            z-index: 100;
+        }
+        .story-pop strong {
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 25px; border-radius: 15px; border: 2px solid var(--neon-green); box-shadow: 0 0 15px rgba(0,255,102,0.3); margin-top: 40px; }
+        h1 { color: var(--neon-green); font-size: 1.5rem; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
+        
+        .status-box { background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; margin: 15px 0; border: 1px solid #444; }
+        .battle-area { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 10px; margin: 20px 0; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        button { background: var(--neon-green); color: #000; border: none; padding: 12px 25px; font-size: 1rem; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; margin: 5px; }
+        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        .btn-reset { background: #ff3333; color: #fff; font-size: 0.8rem; padding: 8px 15px; }
+
+        /* ストーリー（フェードアウト）用演出画面 */
+        #story-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .story-text-box {
+            max-width: 500px;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--neon-red);
+            border: 1px dashed var(--neon-red);
+            background: rgba(20, 0, 0, 0.6);
+            min-height: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 8px rgba(255,51,51,0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左上のポップ表示 -->
+    <div class="story-pop">
+        📜 次のストーリーまで<br>
+        あと <strong id="remaining-to-story">30</strong> 体
+    </div>
+
+    <div class="container">
+        <h1>💻 コンピュータウィルス撲滅大作戦☆</h1>
+        <div class="status-box">
+            <div>累計撃破数: <strong id="kill-count">0</strong> / 5,000 体</div>
+        </div>
+
+        <div class="battle-area">
+            <div id="enemy-display" style="font-size: 2rem; margin-bottom: 10px;">🦠 雑魚ウィルス</div>
+            <button onclick="attackVirus()">ウィルスを駆除する！</button>
+        </div>
+        <div id="message" style="color: #00ff66; font-weight: bold;">PCを守るため、ウィルスを叩け！</div>
+
+        <button class="btn-reset" onclick="resetData()">データを初期化（リセット）</button>
+    </div>
+
+    <!-- ストーリー割り込み用オーバーレイ -->
+    <div id="story-overlay">
+        <div style="font-size: 0.9rem; color: #888; margin-bottom: 15px; letter-spacing: 2px;">ーーー 通信傍受中 ーーー</div>
+        <div class="story-text-box" id="story-text">...</div>
+    </div>
+
+    <script>
+        let killCount = parseInt(localStorage.getItem('virus_kill_count')) || 0;
+        let isStory1Finished = localStorage.getItem('virus_story1_done') === 'true';
+        let isStoryPlaying = false;
+
+        const killCountEl = document.getElementById('kill-count');
+        const remainingEl = document.getElementById('remaining-to-story');
+        const messageEl = document.getElementById('message');
+        const storyOverlay = document.getElementById('story-overlay');
+        const storyTextEl = document.getElementById('story-text');
+
+        // 画面の初期化更新
+        function updateDisplay() {
+            killCountEl.textContent = killCount;
+            
+            // 次のストーリー（30体）までの残り数を計算
+            let remaining = 30 - killCount;
+            if (isStory1Finished || remaining < 0) {
+                remainingEl.textContent = "0 (クリア)";
+            } else {
+                remainingEl.textContent = remaining;
+            }
+        }
+
+        updateDisplay();
+        if (killCount >= 30) {
+            document.getElementById('enemy-display').innerHTML = "🐕 トロイの木犬域";
+        }
+
+        function saveGame() {
+            localStorage.setItem('virus_kill_count', killCount);
+            localStorage.setItem('virus_story1_done', isStory1Finished);
+        }
+
+        function attackVirus() {
+            if (isStoryPlaying) return;
+
+            killCount++;
+            updateDisplay();
+            messageEl.textContent = `ウィルスを1体駆除した！（残り ${5000 - killCount}体）`;
+
+            saveGame();
+
+            if (killCount === 30 && !isStory1Finished) {
+                triggerFirstStory();
+            }
+        }
+
+        function triggerFirstStory() {
+            isStoryPlaying = true;
+            messageEl.textContent = "⚠️ 警告：不審な外部通信を検知……";
+
+            storyOverlay.style.display = 'flex';
+            setTimeout(() => { storyOverlay.style.opacity = '1'; }, 50);
+
+            const dialogues = [
+                "トロイ: このpcにセキュリティソフトが来たようだな",
+                "アゼル: どうせ大したことない雑魚ですよ",
+                "アゼル: 中ボスの「トロイの木犬」を向かわせます",
+                "トロイ: それで十分だろう、早速実行に移れ"
+            ];
+
+            let index = 0;
+.          storyTextEl.textContent = dialogues[index];
+
+            const dialogueInterval = setInterval(() => {
+                index++;
+                if (index < dialogues.length) {
+                    storyTextEl.textContent = dialogues[index];
+                } else {
+                    clearInterval(dialogueInterval);
+                    isStory1Finished = true;
+                    saveGame();
+                    updateDisplay();
+                    endFirstStory();
+                }
+            }, 5000);
+        }
+
+        function endFirstStory() {
+            storyOverlay.style.opacity = '0';
+            setTimeout(() => {
+                storyOverlay.style.display = 'none';
+                isStoryPlaying = false;
+                messageEl.textContent = "🔥 中ボスの影が近づいてくる…！戦闘再開！";
+                document.getElementById('enemy-display').innerHTML = "🐕 トロイの木犬";
+            }, 800);
+        }
+
+        function resetData() {
+            if (confirm("本当にデータを初期化しますか？（撃破数が0になります）")) {
+                localStorage.removeItem('virus_kill_count');
+                localStorage.removeItem('virus_story1_done');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
