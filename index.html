@@ -285,11 +285,11 @@
             } else if (killCount >= 500) {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (レグナ接近)";
             } else if (killCount >= 300) {
-                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ウシロ・ドア戦)";
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (ウシロ・ドア戦後)";
             } else if (killCount >= 100) {
-                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (フィッシュ・イング戦)";
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (フィッシュ・イング戦後)";
             } else if (killCount >= 50) {
-                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (中ボス討伐後)";
+                enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (トロイの木犬戦後)";
             } else {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦";
             }
@@ -377,6 +377,9 @@
                         "ノクス: ではセキュリティ野郎も倒して手柄を上げて、報酬を貰おうかしらね、行きなさい、キロガ"
                     ]);
                 }
+
+                // 通常ザコを倒した時も、区切りごとに表示を更新する
+                updateEnvironmentDisplay();
             }
         }
 
@@ -524,7 +527,7 @@
                 updateEnvironmentDisplay();
                 triggerStory([
                     "ノクス: あら、キロガやられたのね、私自ら行くとしますか...",
-                    "アゼル: そのまま死ね(x15)"
+                    "アゼル: そのまま死ね"
                 ]);
             }
             else if (bossId === 2500) {
