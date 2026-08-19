@@ -128,7 +128,7 @@
     <!-- 左上：ストーリー進行度POP -->
     <div class="story-pop">
         📜 次の目標:<br>
-        <strong id="next-goal-text">50体 (トロイの木犬)</strong>
+        <strong id="next-goal-text">30体 (イベント)</strong>
     </div>
 
     <!-- 右上：コイン＆強化ショップ -->
@@ -152,7 +152,6 @@
                 <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill"></div></div>
             </div>
 
-            <!-- 「海域」などの表記をなくし、シンプルなウィルス戦表示に変更 -->
             <div id="enemy-display" style="font-size: 1.5rem; margin-bottom: 5px;">🦠 ウィルス戦</div>
             
             <!-- 巨大メインボタン -->
@@ -219,7 +218,9 @@
                 shopContainerEl.style.display = 'none';
             }
 
-            if (killCount < 50) {
+            if (killCount < 30) {
+                nextGoalTextEl.textContent = "30体 (最初のイベント)";
+            } else if (killCount < 50) {
                 nextGoalTextEl.textContent = "50体 (トロイの木犬)";
             } else if (killCount < 100) {
                 nextGoalTextEl.textContent = "100体 (フィッシュ・イング)";
@@ -265,7 +266,6 @@
         updateDisplay();
 
         function updateEnvironmentDisplay() {
-            // 海域などの表現を排除し、シンプルなウィルス戦表示に統一
             if (killCount >= 1000) {
                 enemyDisplayEl.innerHTML = "🦠 ウィルス戦 (最終防衛)";
             } else if (killCount >= 750) {
@@ -305,20 +305,35 @@
                 saveGame();
                 messageEl.textContent = `ウィルスを駆除した！ (残り ${5000 - killCount}体)`;
 
-                if (killCount === 50 && storyProgress < 1) {
+                // 30体到達時の最初のストーリー復活！
+                if (killCount === 30 && storyProgress < 1) {
+                    storyProgress = 1;
+                    saveGame();
+                    triggerStory([
+                        "トロイ: このPCにセキュリティソフトが来たようだな",
+                        "アゼル: どうせ大したことない雑魚ですよ",
+                        "アゼル: 中ボスの「トロイの木犬」を向かわせます",
+                        "トロイ: それで十分だろう、早速実行に移れ"
+                    ]);
+                }
+                else if (killCount === 50 && storyProgress < 2) {
                     startBossBattle(50, 50, false);
-                } else if (killCount === 100 && storyProgress < 2) {
+                }
+                else if (killCount === 100 && storyProgress < 3) {
                     startBossBattle(100, 100, false);
-                } else if (killCount === 300 && storyProgress < 3) {
+                }
+                else if (killCount === 300 && storyProgress < 4) {
                     startBossBattle(300, 300, false);
-                } else if (killCount === 500 && storyProgress < 4) {
+                }
+                else if (killCount === 500 && storyProgress < 5) {
                     startBossBattle(500, 300, false);
-                } else if (killCount === 1000 && storyProgress < 6) {
+                }
+                else if (killCount === 1000 && storyProgress < 7) {
                     startBossBattle(1000, 500, false);
                 }
 
-                if (killCount === 750 && storyProgress === 4) {
-                    storyProgress = 5;
+                if (killCount === 750 && storyProgress === 5) {
+                    storyProgress = 6;
                     saveGame();
                     triggerStory([
                         "アゼル: ゼクス来てくれ",
@@ -381,9 +396,7 @@
             }, 1000);
         }
 
-        // --- 負けた時：30体前に戻る ＋ ご指定のダイアログ表示 ---
         function retryFrom30() {
-            // ご指定のダイアログを表示
             alert("負けたので30体巻き戻します\n\nコインを稼いで、強化してリベンジしよう！");
 
             showRetryButtonFlag = false;
@@ -403,7 +416,7 @@
             showRetryButtonFlag = false;
 
             if (bossId === 50) {
-                storyProgress = 1;
+                storyProgress = 2;
                 killCount = 50;
                 saveGame();
                 updateEnvironmentDisplay();
@@ -415,7 +428,7 @@
                 ]);
             } 
             else if (bossId === 100) {
-                storyProgress = 2;
+                storyProgress = 3;
                 killCount = 100;
                 saveGame();
                 updateEnvironmentDisplay();
@@ -427,7 +440,7 @@
                 ]);
             }
             else if (bossId === 300) {
-                storyProgress = 3;
+                storyProgress = 4;
                 killCount = 300;
                 saveGame();
                 updateEnvironmentDisplay();
@@ -437,7 +450,7 @@
                 ]);
             }
             else if (bossId === 500) {
-                storyProgress = 4;
+                storyProgress = 5;
                 killCount = 500;
                 saveGame();
                 updateEnvironmentDisplay();
@@ -449,7 +462,7 @@
                 ]);
             }
             else if (bossId === 1000) {
-                storyProgress = 6;
+                storyProgress = 7;
                 killCount = 1000;
                 saveGame();
                 updateEnvironmentDisplay();
