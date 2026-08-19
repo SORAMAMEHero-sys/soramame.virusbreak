@@ -8,7 +8,7 @@
         :root { --bg-color: #0b1d3a; --neon-green: #00ff66; --neon-red: #ff3333; --white: #f0f0f0; }
         body { font-family: 'Courier New', monospace; background-color: var(--bg-color); color: var(--white); text-align: center; margin: 0; padding: 20px; }
         
-        /* ▼▼▼ 左上のストーリー進行度POPのスタイル ▼▼▼ */
+        /* 左上のストーリー進行度POP */
         .story-pop {
             position: fixed;
             top: 15px;
@@ -23,10 +23,7 @@
             box-shadow: 0 0 10px rgba(0,255,102,0.2);
             z-index: 100;
         }
-        .story-pop strong {
-            color: #fff;
-            font-size: 1rem;
-        }
+        .story-pop strong { color: #fff; font-size: 1rem; }
 
         .container { max-width: 600px; margin: 0 auto; background: rgba(0, 0, 0, 0.6); padding: 25px; border-radius: 15px; border: 2px solid var(--neon-green); box-shadow: 0 0 15px rgba(0,255,102,0.3); margin-top: 40px; }
         h1 { color: var(--neon-green); font-size: 1.5rem; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
@@ -38,7 +35,12 @@
         button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
         .btn-reset { background: #ff3333; color: #fff; font-size: 0.8rem; padding: 8px 15px; }
 
-        /* ストーリー（フェードアウト）用演出画面 */
+        /* ボス戦用タイマー・HP表示 */
+        #boss-ui { display: none; margin-bottom: 15px; color: var(--neon-red); font-weight: bold; }
+        .boss-hp-bar { width: 100%; max-width: 300px; height: 15px; background: #333; border: 1px solid var(--neon-red); border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .boss-hp-fill { width: 100%; height: 100%; background: var(--neon-red); transition: width 0.1s; }
+
+        /* ストーリー用オーバーレイ */
         #story-overlay {
             display: none;
             position: fixed;
@@ -68,9 +70,8 @@
 </head>
 <body>
 
-    <!-- 左上のポップ表示 -->
     <div class="story-pop">
-        📜 次のストーリーまで<br>
+        📜 次のイベントまで<br>
         あと <strong id="remaining-to-story">30</strong> 体
     </div>
 
@@ -81,15 +82,22 @@
         </div>
 
         <div class="battle-area">
+            <!-- ボス戦UI -->
+            <div id="boss-ui">
+                ⚠️ 中ボス「トロイの木犬」交戦中！<br>
+                残り時間: <span id="timer-display">30</span>秒<br>
+                HP: <span id="boss-hp">50</span> / 50
+                <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill"></div></div>
+            </div>
+
             <div id="enemy-display" style="font-size: 2rem; margin-bottom: 10px;">🦠 雑魚ウィルス</div>
-            <button onclick="attackVirus()">ウィルスを駆除する！</button>
+            <button id="action-btn" onclick="attackVirus()">ウィルスを駆除する！</button>
         </div>
         <div id="message" style="color: #00ff66; font-weight: bold;">PCを守るため、ウィルスを叩け！</div>
 
         <button class="btn-reset" onclick="resetData()">データを初期化（リセット）</button>
     </div>
 
-    <!-- ストーリー割り込み用オーバーレイ -->
     <div id="story-overlay">
         <div style="font-size: 0.9rem; color: #888; margin-bottom: 15px; letter-spacing: 2px;">ーーー 通信傍受中 ーーー</div>
         <div class="story-text-box" id="story-text">...</div>
@@ -98,51 +106,108 @@
     <script>
         let killCount = parseInt(localStorage.getItem('virus_kill_count')) || 0;
         let isStory1Finished = localStorage.getItem('virus_story1_done') === 'true';
+        let isBossActive = localStorage.getItem('virus_boss_active') === 'true';
+        let isBossDefeated = localStorage.getItem('virus_boss_defeated') === 'true';
         let isStoryPlaying = false;
+
+        // ボス用変数
+        let bossHp = parseInt(localStorage.getItem('virus_boss_hp')) || 50;
+        let timeLeft = 30;
+        let bossTimer = null;
+        let reviveTimer = null;
 
         const killCountEl = document.getElementById('kill-count');
         const remainingEl = document.getElementById('remaining-to-story');
         const messageEl = document.getElementById('message');
         const storyOverlay = document.getElementById('story-overlay');
         const storyTextEl = document.getElementById('story-text');
+        
+        const bossUiEl = document.getElementById('boss-ui');
+        const bossHpEl = document.getElementById('boss-hp');
+        const bossHpFillEl = document.getElementById('boss-hp-fill');
+        const timerDisplayEl = document.getElementById('timer-display');
+        const enemyDisplayEl = document.getElementById('enemy-display');
 
-        // 画面の初期化更新
         function updateDisplay() {
             killCountEl.textContent = killCount;
             
-            // 次のストーリー（30体）までの残り数を計算
+            // イベント目標の計算（30体でストーリー1、50体でボス）
             let remaining = 30 - killCount;
-            if (isStory1Finished || remaining < 0) {
-                remainingEl.textContent = "0 (クリア)";
+            if (killCount >= 30 && !isBossDefeated) {
+                remaining = 50 - killCount;
+                remainingEl.innerHTML = `<span style="color:var(--neon-red);">ボス戦まであと ${remaining}体</span>`;
+            } else if (isBossDefeated) {
+                remainingEl.textContent = "0 (ボス撃破済)";
             } else {
-                remainingEl.textContent = remaining;
+                remainingEl.textContent = remaining > 0 ? remaining : 0;
+            }
+
+            if (isBossActive) {
+                bossHpEl.textContent = bossHp;
+                bossHpFillEl.style.width = (bossHp / 50 * 100) + '%';
             }
         }
 
-        updateDisplay();
-        if (killCount >= 30) {
-            document.getElementById('enemy-display').innerHTML = "🐕 トロイの木犬域";
+        // 起動時の復元処理
+        if (isBossActive && !isBossDefeated) {
+            startBossBattle(true); // ページリロード時もボス戦を再開
+        } else if (isBossDefeated) {
+            enemyDisplayEl.innerHTML = "🛡️ ピースフルエリア";
+        } else if (killCount >= 30) {
+            enemyDisplayEl.innerHTML = "🐕 トロイの木犬接近中";
         }
+        updateDisplay();
 
         function saveGame() {
             localStorage.setItem('virus_kill_count', killCount);
             localStorage.setItem('virus_story1_done', isStory1Finished);
+            localStorage.setItem('virus_boss_active', isBossActive);
+            localStorage.setItem('virus_boss_defeated', isBossDefeated);
+            localStorage.setItem('virus_boss_hp', bossHp);
         }
 
+        // メインの攻撃・クリック処理
         function attackVirus() {
             if (isStoryPlaying) return;
 
-            killCount++;
-            updateDisplay();
-            messageEl.textContent = `ウィルスを1体駆除した！（残り ${5000 - killCount}体）`;
+            if (isBossActive) {
+                // --- ボス戦中の処理 ---
+                bossHp--;
+                updateDisplay();
+                saveGame();
 
-            saveGame();
+                if (bossHp <= 0) {
+                    // ボス撃破！
+                    clearInterval(bossTimer);
+                    clearInterval(reviveTimer);
+                    isBossActive = false;
+                    isBossDefeated = true;
+                    killCount = 50;
+                    saveGame();
 
-            if (killCount === 30 && !isStory1Finished) {
-                triggerFirstStory();
+                    bossUiEl.style.display = 'none';
+                    enemyDisplayEl.innerHTML = "🛡️ 撃破完了！";
+                    messageEl.innerHTML = "🎉 中ボス「トロイの木犬」を完全駆除した！！";
+                }
+            } else if (!isBossDefeated) {
+                // --- 通常雑魚戦の処理 ---
+                killCount++;
+                updateDisplay();
+                messageEl.textContent = `ウィルスを1体駆除した！（残り ${5000 - killCount}体）`;
+                saveGame();
+
+                // 30体到達時：ストーリー発動
+                if (killCount === 30 && !isStory1Finished) {
+                    triggerFirstStory();
+                }
+                // 50体到達時：ボス戦突入
+                else if (killCount === 50 && !isBossActive) {
+                    startBossBattle(false);
+                }
             }
         }
 
+        // 30体ストーリー
         function triggerFirstStory() {
             isStoryPlaying = true;
             messageEl.textContent = "⚠️ 警告：不審な外部通信を検知……";
@@ -158,7 +223,7 @@
             ];
 
             let index = 0;
-.          storyTextEl.textContent = dialogues[index];
+            storyTextEl.textContent = dialogues[index];
 
             const dialogueInterval = setInterval(() => {
                 index++;
@@ -179,15 +244,54 @@
             setTimeout(() => {
                 storyOverlay.style.display = 'none';
                 isStoryPlaying = false;
-                messageEl.textContent = "🔥 中ボスの影が近づいてくる…！戦闘再開！";
-                document.getElementById('enemy-display').innerHTML = "🐕 トロイの木犬";
+                messageEl.textContent = "🔥 50体目に「トロイの木犬」が出現する…備えろ！";
+                enemyDisplayEl.innerHTML = "🐕 トロイの木犬接近中";
             }, 800);
         }
 
+        // --- ボス戦開始ロジック ---
+        function startBossBattle(isResuming) {
+            isBossActive = true;
+            enemyDisplayEl.innerHTML = "🐕 中ボス：トロイの木犬";
+            bossUiEl.style.display = 'block';
+            messageEl.innerHTML = "⚠️ 30秒以内に50回連打して撃破しろ！！";
+
+            if (!isResuming) {
+                timeLeft = 30;
+                bossHp = 50;
+            }
+
+            saveGame();
+            updateDisplay();
+
+            // 30秒の制限タイマー開始
+            clearInterval(bossTimer);
+            bossTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplayEl.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    // 時間切れ！
+                    clearInterval(bossTimer);
+                    bossUiEl.style.display = 'none';
+                    messageEl.innerHTML = "❌ タイムアップ……！トロイの木犬が再生を始める……";
+                    
+                    // 5秒後にHP復活
+                    clearInterval(reviveTimer);
+                    reviveTimer = setTimeout(() => {
+                        bossHp = 50;
+                        timeLeft = 30;
+                        bossUiEl.style.display = 'block';
+                        messageEl.innerHTML = "🔄 HPが復活した！再び30秒以内に叩け！！";
+                        startBossBattle(true); // タイマー再始動
+                    }, 5000); // 5秒後
+                }
+            }, 1000);
+        }
+
         function resetData() {
-            if (confirm("本当にデータを初期化しますか？（撃破数が0になります）")) {
-                localStorage.removeItem('virus_kill_count');
-                localStorage.removeItem('virus_story1_done');
+            if (confirm("本当にデータを初期化しますか？")) {
+                localStorage.clear();
                 location.reload();
             }
         }
